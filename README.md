@@ -43,7 +43,7 @@ An overview of approaches to improving UI text review and documentation quality 
 ## Contact
 
 - **Portfolio:** https://afridimtiyaz.github.io/
-- **LinkedIn:** www.linkedin.com/in/md-afrid-imtiyaz-1a8a39221
+- **LinkedIn:** www.linkedin.com/in/md-afrid-imtiyaz
 - **Email:** afridimtiyaz449@gmail.com
 
 ---
