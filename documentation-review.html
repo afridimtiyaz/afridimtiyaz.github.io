@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="UI Text Review System by Afrid Imtiyaz — a tool for reviewing interface text, analyzing screenshots, reviewing Figma screens, and managing UI text repositories.">
+  <title>UI Text Review System | Afrid Imtiyaz</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f8fafc;
+      color: #172033;
+      line-height: 1.7;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 20px 24px;
+    }
+
+    nav {
+      max-width: 960px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: #172033;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 48px 24px 64px;
+    }
+
+    .back {
+      color: #2457c5;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .tag {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: #e8efff;
+      color: #244a9b;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: clamp(34px, 5vw, 48px);
+      line-height: 1.15;
+      letter-spacing: -1.3px;
+      margin: 18px 0;
+    }
+
+    h2 {
+      font-size: 24px;
+      line-height: 1.3;
+      margin: 0 0 14px;
+    }
+
+    h3 {
+      font-size: 18px;
+      margin: 0 0 8px;
+    }
+
+    p {
+      margin-top: 0;
+    }
+
+    .intro {
+      max-width: 740px;
+      font-size: 19px;
+      color: #526078;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 26px 0 36px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 12px 18px;
+      border: 1px solid #172b55;
+      border-radius: 8px;
+      background: #172b55;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .button.secondary {
+      background: #fff;
+      color: #172b55;
+    }
+
+    .section {
+      margin-top: 38px;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .feature {
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+    }
+
+    .feature p {
+      margin-bottom: 0;
+      color: #526078;
+    }
+
+    ul, ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .skills span {
+      background: #eef2f7;
+      color: #334155;
+      border-radius: 6px;
+      padding: 7px 11px;
+      font-size: 14px;
+    }
+
+    .note {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    footer {
+      border-top: 1px solid #e2e8f0;
+      padding: 24px;
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding-top: 32px;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <a href="index.html">Afrid Imtiyaz</a>
+      <a href="index.html#work">← Back to Portfolio</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <a class="back" href="index.html#work">← All projects</a>
+
+    <span class="tag">Productivity Tool · UI Content Quality</span>
+
+    <h1>UI Text Review System</h1>
+
+    <p class="intro">
+      A tool I built to help streamline software interface text reviews
+      by checking existing wording, analyzing screenshots, reviewing
+      Figma screens, and managing a repository of UI text.
+    </p>
+
+    <div class="actions">
+      <a class="button"
+         href="https://ui-text-review.onrender.com/"
+         target="_blank"
+         rel="noopener noreferrer">
+        Try the Live Demo →
+      </a>
+
+      <a class="button secondary" href="#features">
+        Explore Features
+      </a>
+    </div>
+
+    <section class="panel">
+      <h2>Project Overview</h2>
+      <p>
+        Software interfaces contain many types of text, including
+        field labels, buttons, headings, tooltips, descriptions,
+        notifications, and error messages. Reviewing this content
+        consistently requires attention to grammar, terminology,
+        clarity, and existing product conventions.
+      </p>
+      <p>
+        I built the UI Text Review System to bring several review
+        activities into one place and help make the process more
+        structured and efficient.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>The Challenge</h2>
+      <p>
+        UI text reviewers need to compare proposed wording with
+        existing repository entries, identify potential content
+        issues, and maintain consistency across screens. Reviewing
+        screenshots and design files can add further manual work.
+      </p>
+      <p>
+        The tool brings these activities together in a single
+        interface, with options for reviewing existing text,
+        analyzing visual designs, and managing repository entries.
+      </p>
+    </section>
+
+    <section class="section" id="features">
+      <h2>Key Features</h2>
+      <p>
+        The tool brings together the following capabilities.
+      </p>
+
+      <div class="grid">
+        <article class="feature">
+          <h3>01. UI Text Review</h3>
+          <p>
+            Check text against the existing repository and review
+            wording for spelling, grammar, tone, and terminology.
+            Specify the UI element type, such as a button, label,
+            tooltip, or error message.
+          </p>
+        </article>
+
+        <article class="feature">
+          <h3>02. Screenshot Analysis</h3>
+          <p>
+            Upload one or more UI screenshots to extract visible
+            text, compare it with repository entries, and review
+            text that is not found in the repository.
+          </p>
+        </article>
+
+        <article class="feature">
+          <h3>03. Figma VD Review</h3>
+          <p>
+            Provide a Figma file or frame URL and a personal access
+            token to fetch screens and review their UI text.
+          </p>
+        </article>
+
+        <article class="feature">
+          <h3>04. New Key Generation</h3>
+          <p>
+            Describe a UI element to generate a proposed
+            internationalization key, English text, and category.
+            An optional module can provide additional context.
+          </p>
+        </article>
+
+        <article class="feature">
+          <h3>05. Repository Management</h3>
+          <p>
+            Search and filter text entries, view suggested text
+            changes, and import or export repository data using
+            CSV files.
+          </p>
+        </article>
+
+        <article class="feature">
+          <h3>06. Structured Review</h3>
+          <p>
+            Organize UI content by keys, categories, modules,
+            original English text, and suggested text to support
+            a more consistent review process.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>How It Works</h2>
+
+      <div class="panel">
+        <ol>
+          <li>
+            <strong>Choose the input:</strong> Enter UI text,
+            upload screenshots, or provide a Figma URL.
+          </li>
+          <li>
+            <strong>Check existing content:</strong> Compare text
+            with repository entries where applicable.
+          </li>
+          <li>
+            <strong>Review suggestions:</strong> Examine proposed
+            wording and potential content issues.
+          </li>
+          <li>
+            <strong>Manage the repository:</strong> Search, filter,
+            import, or export entries as needed.
+          </li>
+        </ol>
+        <p class="note">
+          This describes the intended reviewer workflow; individual
+          steps depend on the selected feature.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>My Contribution</h2>
+      <p>
+        I built this tool to address practical challenges in UI
+        content review. The project brings repository-based text
+        checking, screenshot analysis, Figma review, and new-key
+        generation into one interface.
+      </p>
+      <p>
+        The project also reflects my interest in combining technical
+        writing, content quality practices, and workflow improvement
+        to solve problems encountered during software documentation
+        and interface review.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>Skills Demonstrated</h2>
+      <div class="panel">
+        <div class="skills">
+          <span>Technical Writing</span>
+          <span>UI Microcopy</span>
+          <span>Content Quality</span>
+          <span>Terminology Consistency</span>
+          <span>Information Organization</span>
+          <span>Workflow Improvement</span>
+          <span>Tool Development</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Project Takeaway</h2>
+      <p>
+        This project explores how a dedicated review tool can bring
+        different UI content review activities into one workflow.
+        It supports reviewers in locating existing wording and
+        evaluating suggested changes while keeping content quality
+        and context central to the process.
+      </p>
+    </section>
+
+    <section class="section panel">
+      <h2>Explore the Tool</h2>
+      <p>
+        Try the live application to explore its UI text review,
+        screenshot analysis, Figma review, and repository features.
+      </p>
+      <a class="button"
+         href="https://ui-text-review.onrender.com/"
+         target="_blank"
+         rel="noopener noreferrer">
+        Open UI Text Review System →
+      </a>
+    </section>
+
+    <p class="note" style="margin-top: 28px;">
+      Note: The features described here reflect the tool's interface.
+      Review suggestions should be checked for accuracy and context.
+    </p>
+
+    <div class="actions">
+      <a class="back" href="index.html#work">← Back to Selected Work</a>
+    </div>
+  </main>
+
+  <footer>
+    © 2026 Afrid Imtiyaz · Technical Writing Portfolio
+  </footer>
+</body>
+</html>
