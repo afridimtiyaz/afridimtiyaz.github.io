@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>UI Microcopy Review Case Study | Afrid Imtiyaz</title>
+  <meta name="description" content="A technical writing case study demonstrating UI microcopy review, clarity, consistency, and actionable error messages.">
+  <link rel="canonical" href="https://afridimtiyaz.github.io/ui-microcopy-review.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://afridimtiyaz.github.io/ui-microcopy-review.html">
+  <meta property="og:title" content="UI Microcopy Review Case Study | Afrid Imtiyaz">
+  <meta property="og:description" content="A practical approach to reviewing interface text so users can understand messages, identify problems, and take the right action.">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#F7F8FA" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F1726" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%2316233B'/><text x='50%' y='54%' text-anchor='middle' dominant-baseline='middle' font-family='Georgia,serif' font-size='34' fill='%23FFFFFF'>A</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper: #F7F8FA; --surface: #FFFFFF; --ink: #16233B; --muted: #55627A;
+      --rule: #DDE2EA; --link: #0A5FA8; --link-hover: #073F70; --ins: #1A7F37; --mark: #FFF0B3;
+      --serif: "Literata", Georgia, "Times New Roman", serif;
+      --sans: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      --measure: 68ch;
+      --gutter: clamp(20px, 6vw, 80px);
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --paper: #0F1726; --surface: #16203A; --ink: #E8ECF3; --muted: #A3AEC2;
+        --rule: #27324D; --link: #8CC3FF; --link-hover: #C2E0FF; --ins: #7ED99A; --mark: #4A3F12;
+        color-scheme: dark;
+      }
+    }
+    :root[data-theme="dark"] {
+      --paper: #0F1726; --surface: #16203A; --ink: #E8ECF3; --muted: #A3AEC2;
+      --rule: #27324D; --link: #8CC3FF; --link-hover: #C2E0FF; --ins: #7ED99A; --mark: #4A3F12;
+      color-scheme: dark;
+    }
+
+    *, *::before, *::after { box-sizing: inherit; }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(84px + env(safe-area-inset-top, 0px)); }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
+
+    a { color: var(--link); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:hover { color: var(--link-hover); }
+    :focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 4px; }
+
+    h1, h2, h3 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+    h2 { font-size: clamp(26px, 3vw, 32px); line-height: 1.2; margin-bottom: 14px; }
+    h3 { font-size: 19px; line-height: 1.35; margin-bottom: 6px; }
+    p { margin: 0 0 1em; }
+
+    .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: var(--paper); padding: 8px 14px; z-index: 50; }
+    .skip:focus { left: 12px; }
+
+    header.site {
+      position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding: 14px var(--gutter);
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+    }
+    .brand { font-family: var(--serif); font-weight: 700; font-size: 19px; color: var(--ink); text-decoration: none; }
+    header nav { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+    header nav a { color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 500; }
+    header nav a:hover { color: var(--link); }
+
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 8px; border: 1px solid var(--ink); font-family: var(--sans); font-size: 15px; font-weight: 600; text-decoration: none; }
+    .btn.primary { background: var(--ink); color: var(--paper); }
+    .btn.primary:hover { background: var(--link-hover); border-color: var(--link-hover); color: var(--paper); }
+    .btn.ghost { background: transparent; color: var(--ink); }
+    .btn.ghost:hover { background: var(--surface); color: var(--ink); }
+    header .btn { padding: 8px 14px; font-size: 14px; }
+    .ext::after { content: "↗"; font-weight: 400; }
+
+    /* Hero */
+    .hero {
+      display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: clamp(32px, 5vw, 72px); align-items: end;
+      max-width: 1320px; margin: 0 auto;
+      padding: clamp(40px, 7vw, 88px) var(--gutter) clamp(40px, 6vw, 72px);
+    }
+    .crumb { font-size: 15px; margin-bottom: 22px; }
+    .crumb a { color: var(--muted); text-decoration: none; }
+    .crumb a:hover { color: var(--ink); text-decoration: underline; }
+    .crumb span { color: var(--muted); margin: 0 8px; }
+    .kicker { color: var(--muted); font-size: 16px; margin-bottom: 14px; }
+    .hero h1 { font-size: clamp(38px, 5.2vw, 60px); line-height: 1.06; letter-spacing: -0.025em; margin-bottom: 22px; }
+    .hero .lede { font-size: 19px; color: var(--muted); max-width: 54ch; margin-bottom: 28px; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .facts { margin: 0; display: grid; gap: 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 20px 22px; }
+    .facts div { display: grid; gap: 2px; }
+    .facts dt { font-size: 13px; color: var(--muted); }
+    .facts dd { margin: 0; font-weight: 600; font-size: 15.5px; }
+
+    /* Docs layout */
+    .doc { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); max-width: 1320px; margin: 0 auto; padding: 0 var(--gutter); }
+    .toc { position: sticky; top: calc(96px + env(safe-area-inset-top, 0px)); align-self: start; padding-top: 64px; }
+    .toc p { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+    .toc ol { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--rule); }
+    .toc a { display: block; padding: 6px 0 6px 16px; margin-left: -1px; border-left: 2px solid transparent; color: var(--muted); text-decoration: none; font-size: 14.5px; }
+    .toc a:hover { color: var(--ink); }
+    .toc a.active { color: var(--ink); border-left-color: var(--ink); font-weight: 600; }
+
+    .content > section { padding: 64px 0; border-top: 1px solid var(--rule); }
+    .content p { max-width: var(--measure); }
+    .muted { color: var(--muted); }
+
+    /* Features: two-column definition grid */
+    .features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin-top: 24px; border-top: 1px solid var(--rule); }
+    .features article { padding: 22px 28px 22px 0; border-bottom: 1px solid var(--rule); }
+    .features article:nth-child(even) { padding: 22px 0 22px 28px; border-left: 1px solid var(--rule); }
+    .features p { color: var(--muted); margin: 0; font-size: 16px; }
+
+    /* Workflow: a real sequence, so numbered */
+    .flow { list-style: none; padding: 0; margin: 24px 0 0; counter-reset: step; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); overflow: hidden; }
+    .flow li { counter-increment: step; padding: 20px 18px; border-left: 1px solid var(--rule); }
+    .flow li:first-child { border-left: 0; }
+    .flow li::before { content: counter(step); display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--ink); font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+    .flow strong { display: block; font-family: var(--serif); font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+    .flow span { display: block; font-size: 15px; color: var(--muted); line-height: 1.5; }
+    .note { color: var(--muted); font-size: 14.5px; margin-top: 14px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--rule); font-size: 14.5px; font-weight: 500; }
+    .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 40px; }
+    .two h3 { font-size: 17px; margin-bottom: 12px; }
+
+    .takeaway { font-family: var(--serif); font-size: 21px; line-height: 1.55; max-width: 60ch; }
+
+    .cta { background: var(--ink); color: var(--paper); border-radius: 16px; padding: clamp(28px, 5vw, 48px); }
+    .cta h2 { color: var(--paper); }
+    .cta p { color: color-mix(in srgb, var(--paper) 78%, var(--ink)); font-size: 18px; }
+    .cta .btn.primary { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+    .cta .btn.primary:hover { background: var(--mark); border-color: var(--mark); color: #16233B; }
+    .cta .btn.ghost { color: var(--paper); border-color: color-mix(in srgb, var(--paper) 50%, transparent); }
+    .cta .btn.ghost:hover { background: color-mix(in srgb, var(--paper) 12%, transparent); }
+    .content > section.end { border-top: 0; padding-top: 8px; }
+
+    footer { max-width: 1320px; margin: 0 auto; padding: 28px var(--gutter) 40px; color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    footer a { color: var(--muted); }
+
+    @media (max-width: 1080px) {
+      .flow { grid-template-columns: minmax(0, 1fr); }
+      .flow li { border-left: 0; border-top: 1px solid var(--rule); display: grid; grid-template-columns: 40px 1fr; column-gap: 12px; }
+      .flow li:first-child { border-top: 0; }
+      .flow li::before { margin: 0; grid-row: span 2; }
+    }
+    @media (max-width: 960px) {
+      .hero, .doc, .two { grid-template-columns: minmax(0, 1fr); }
+      .toc { display: none; }
+    }
+    @media (max-width: 720px) {
+      .features { grid-template-columns: minmax(0, 1fr); }
+      .features article, .features article:nth-child(even) { padding: 20px 0; border-left: 0; }
+      .content > section { padding: 52px 0; }
+    }
+  
+    /* Guide outline */
+    .outline { margin: 24px 0 0; padding: 0; list-style: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+    .outline li { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 20px; padding: 16px 22px; border-top: 1px solid var(--rule); }
+    .outline li:first-child { border-top: 0; }
+    .outline strong { font-family: var(--serif); font-weight: 600; font-size: 17px; }
+    .outline span { color: var(--muted); font-size: 15.5px; }
+    .contrib { margin: 0; padding-left: 20px; max-width: var(--measure); }
+    .contrib li { margin-bottom: 8px; }
+    .contrib li::marker { color: var(--muted); }
+    .chips.top { margin-top: 26px; }
+    .callout { border-left: 3px solid var(--ink); background: var(--surface); padding: 16px 20px; border-radius: 0 8px 8px 0; color: var(--muted); font-size: 15.5px; max-width: var(--measure); margin-top: 24px; }
+    @media (max-width: 720px) { .outline li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+  
+    :root { --del: #B42318; --del-bg: #FBE9E7; --ins-bg: #E3F3E7; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --del: #FF968C; --del-bg: #3A1A19; --ins-bg: #133222; } }
+    :root[data-theme="dark"] { --del: #FF968C; --del-bg: #3A1A19; --ins-bg: #133222; }
+
+    /* Numbered review steps (vertical, a real sequence) */
+    .steps-v { list-style: none; counter-reset: s; margin: 24px 0 0; padding: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+    .steps-v li { counter-increment: s; display: grid; grid-template-columns: 40px minmax(0, 220px) minmax(0, 1fr); gap: 16px; align-items: start; padding: 16px 22px; border-top: 1px solid var(--rule); }
+    .steps-v li:first-child { border-top: 0; }
+    .steps-v li::before { content: counter(s); display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--ink); font-size: 13px; font-weight: 700; }
+    .steps-v strong { font-family: var(--serif); font-weight: 600; font-size: 17px; }
+    .steps-v span { color: var(--muted); font-size: 15.5px; }
+
+    /* Before / after */
+    .compare { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 24px; }
+    .compare > div { border-radius: 12px; padding: 20px 22px; border: 1px solid var(--rule); background: var(--surface); }
+    .compare .label { display: inline-block; font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; }
+    .compare .before .label { color: var(--del); background: var(--del-bg); }
+    .compare .after .label { color: var(--ins); background: var(--ins-bg); }
+    .compare p { font-family: var(--serif); font-size: 20px; line-height: 1.5; margin: 0; }
+    .compare .before p { color: var(--muted); }
+    .why { margin-top: 28px; }
+    .why h3 { font-size: 18px; margin-bottom: 10px; }
+    .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: var(--measure); }
+    .checks li { position: relative; padding-left: 28px; }
+    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--ins); font-weight: 700; }
+    .checklist { list-style: none; margin: 24px 0 0; padding: 0; border-top: 1px solid var(--rule); max-width: 760px; }
+    .checklist li { position: relative; padding: 14px 0 14px 36px; border-bottom: 1px solid var(--rule); }
+    .checklist li::before { content: ""; position: absolute; left: 0; top: 17px; width: 18px; height: 18px; border: 1.5px solid var(--ink); border-radius: 4px; }
+    .checklist li::after { content: ""; position: absolute; left: 6px; top: 20px; width: 6px; height: 10px; border: solid var(--ins); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+    @media (max-width: 720px) {
+      .compare { grid-template-columns: minmax(0, 1fr); }
+      .steps-v li { grid-template-columns: 34px minmax(0, 1fr); }
+      .steps-v span { grid-column: 2; }
+    }
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site">
+  <a class="brand" href="index.html">Afrid Imtiyaz</a>
+  <nav aria-label="Main">
+    <a href="index.html#work">Back to portfolio</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+  <a class="btn primary" href="resume.pdf" download>Résumé</a>
+</header>
+
+<main id="main">
+  <div class="hero">
+    <div>
+      <p class="crumb"><a href="index.html">Portfolio</a><span aria-hidden="true">/</span><a href="index.html#work">All projects</a></p>
+      <p class="kicker">Technical writing case study</p>
+      <h1>Reviewing UI Microcopy for Clarity and Consistency</h1>
+      <p class="lede">
+        A practical approach to reviewing interface text so users can
+        understand messages, identify problems, and take the right action.
+      </p>
+      <div class="actions">
+        <a class="btn primary" href="#example">See the example</a>
+        <a class="btn ghost" href="index.html#work">All projects</a>
+      </div>
+    </div>
+    <dl class="facts" aria-label="Project at a glance">
+      <div><dt>Content type</dt><dd>Labels, instructions, and error messages</dd></div>
+      <div><dt>Core focus</dt><dd>Clarity, consistency, and usability</dd></div>
+      <div><dt>Review criteria</dt><dd>Grammar, terminology, and actionable guidance</dd></div>
+      <div><dt>My role</dt><dd>Technical Writer</dd></div>
+    </dl>
+  </div>
+
+  <div class="doc">
+    <nav class="toc" aria-label="On this page">
+      <p>On this page</p>
+      <ol>
+        <li><a href="#challenge">The challenge</a></li>
+        <li><a href="#approach">My review approach</a></li>
+        <li><a href="#example">Illustrative example</a></li>
+        <li><a href="#consistency">Consistency checks</a></li>
+        <li><a href="#reference">Using reference content</a></li>
+        <li><a href="#takeaways">Key takeaways</a></li>
+      </ol>
+    </nav>
+
+    <div class="content">
+      <section id="challenge">
+        <h2>The challenge</h2>
+        <p>
+          Interface text often has limited space but needs to communicate
+          important information. Vague labels, inconsistent terminology,
+          or error messages that do not explain what to do next can make
+          software harder to use.
+        </p>
+        <p>
+          A consistent review process helps identify these problems while
+          preserving the intended product behavior and established terminology.
+        </p>
+      </section>
+
+      <section id="approach">
+        <h2>My review approach</h2>
+        <ol class="steps-v">
+          <li><strong>Understand the context</strong><span>Identify where the text appears and what the user is trying to accomplish.</span></li>
+          <li><strong>Check technical meaning</strong><span>Confirm that a proposed edit preserves the intended behavior.</span></li>
+          <li><strong>Improve clarity</strong><span>Remove unnecessary words and use direct, familiar language.</span></li>
+          <li><strong>Check consistency</strong><span>Compare terminology, capitalization, and phrasing with established interface conventions.</span></li>
+          <li><strong>Make messages actionable</strong><span>When appropriate, explain what happened and what the user can do next.</span></li>
+          <li><strong>Verify the revision</strong><span>Review the proposed text in context before accepting it.</span></li>
+        </ol>
+      </section>
+
+      <section id="example">
+        <h2>Illustrative example</h2>
+        <p>
+          The following example demonstrates the review principle. It is
+          illustrative and is not presented as an actual product message.
+        </p>
+        <div class="compare">
+          <div class="before">
+            <span class="label">Before</span>
+            <p>The operation could not be completed due to an invalid input parameter.</p>
+          </div>
+          <div class="after">
+            <span class="label">After</span>
+            <p>Enter a valid port number to continue.</p>
+          </div>
+        </div>
+        <div class="why">
+          <h3>Why the revision is clearer</h3>
+          <ul class="checks">
+            <li>Uses a direct instruction.</li>
+            <li>Removes unnecessary wording.</li>
+            <li>Gives the user a next step.</li>
+          </ul>
+        </div>
+        <p class="note">
+          In a real review, the revised message would need to be checked against
+          the relevant field, validation rules, and actual product behavior.
+        </p>
+      </section>
+
+      <section id="consistency">
+        <h2>Consistency checks</h2>
+        <ul class="checklist">
+          <li>Use consistent terminology for the same product concept.</li>
+          <li>Keep capitalization and punctuation consistent across similar strings.</li>
+          <li>Prefer direct instructions over vague or unnecessarily passive wording.</li>
+          <li>Preserve existing placeholders and technical meaning when editing strings.</li>
+          <li>Check that suggested changes do not introduce unsupported behavior or assumptions.</li>
+        </ul>
+      </section>
+
+      <section id="reference">
+        <h2>Using reference content</h2>
+        <p>
+          When reviewing large collections of interface text, approved existing
+          strings can serve as a reference for terminology and established
+          phrasing. Automated matching or suggestions can help identify
+          candidates for review, but a writer should verify each proposed change
+          before applying it.
+        </p>
+        <p class="muted">
+          I built a tool that applies this approach.
+          <a href="documentation-review.html">Read the UI Text Review System case study</a>.
+        </p>
+      </section>
+
+      <section id="takeaways">
+        <h2>Key takeaways</h2>
+        <p class="takeaway">
+          Effective UI microcopy review goes beyond grammar. It considers the
+          user's task, the technical meaning, consistency with existing content,
+          and whether the text helps the user take the next step. The goal is
+          concise language that remains accurate and useful in context.
+        </p>
+        <p class="callout">
+          <strong style="color:var(--ink)">Portfolio note:</strong> This page uses a generic example to
+          demonstrate a review approach. It does not reproduce confidential product
+          strings or internal interface screenshots.
+        </p>
+      </section>
+
+      <section class="end">
+        <div class="cta">
+          <h2>Next case study</h2>
+          <p>See how I documented a cloud deployment of Log360 on Amazon EC2, from sizing the instance to verifying log collection.</p>
+          <div class="actions">
+            <a class="btn primary" href="aws-deployment-guide.html">Read: Deploying Log360 on AWS</a>
+            <a class="btn ghost" href="index.html#work">Back to selected work</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>© 2026 Afrid Imtiyaz · Technical Writing Portfolio</span>
+  <a href="#main">Back to top</a>
+</footer>
+<script>
+(function () {
+  var links = document.querySelectorAll(".toc a"), map = {};
+  links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  if (!("IntersectionObserver" in window)) return;
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting && map[e.target.id]) {
+        links.forEach(function (a) { a.classList.remove("active"); });
+        map[e.target.id].classList.add("active");
+      }
+    });
+  }, { rootMargin: "-30% 0px -60% 0px" });
+  document.querySelectorAll(".content > section[id]").forEach(function (s) { io.observe(s); });
+})();
+</script>
+</body>
+</html>
