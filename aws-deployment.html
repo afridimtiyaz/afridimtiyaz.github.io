@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Deploying Log360 on AWS: Case Study | Afrid Imtiyaz</title>
+  <meta name="description" content="A technical writing case study on documenting the deployment of ManageEngine Log360 on Amazon EC2, with S3 log archiving.">
+  <link rel="canonical" href="https://afridimtiyaz.github.io/aws-deployment-guide.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://afridimtiyaz.github.io/aws-deployment-guide.html">
+  <meta property="og:title" content="Deploying Log360 on AWS: Case Study | Afrid Imtiyaz">
+  <meta property="og:description" content="How I documented a cloud deployment of an enterprise SIEM, from sizing the EC2 instance to verifying log collection.">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#F7F8FA" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F1726" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%2316233B'/><text x='50%' y='54%' text-anchor='middle' dominant-baseline='middle' font-family='Georgia,serif' font-size='34' fill='%23FFFFFF'>A</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper: #F7F8FA; --surface: #FFFFFF; --ink: #16233B; --muted: #55627A;
+      --rule: #DDE2EA; --link: #0A5FA8; --link-hover: #073F70; --ins: #1A7F37; --mark: #FFF0B3;
+      --serif: "Literata", Georgia, "Times New Roman", serif;
+      --sans: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      --measure: 68ch;
+      --gutter: clamp(20px, 6vw, 80px);
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --paper: #0F1726; --surface: #16203A; --ink: #E8ECF3; --muted: #A3AEC2;
+        --rule: #27324D; --link: #8CC3FF; --link-hover: #C2E0FF; --ins: #7ED99A; --mark: #4A3F12;
+        color-scheme: dark;
+      }
+    }
+    :root[data-theme="dark"] {
+      --paper: #0F1726; --surface: #16203A; --ink: #E8ECF3; --muted: #A3AEC2;
+      --rule: #27324D; --link: #8CC3FF; --link-hover: #C2E0FF; --ins: #7ED99A; --mark: #4A3F12;
+      color-scheme: dark;
+    }
+
+    *, *::before, *::after { box-sizing: inherit; }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(84px + env(safe-area-inset-top, 0px)); }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
+
+    a { color: var(--link); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:hover { color: var(--link-hover); }
+    :focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 4px; }
+
+    h1, h2, h3 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+    h2 { font-size: clamp(26px, 3vw, 32px); line-height: 1.2; margin-bottom: 14px; }
+    h3 { font-size: 19px; line-height: 1.35; margin-bottom: 6px; }
+    p { margin: 0 0 1em; }
+
+    .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: var(--paper); padding: 8px 14px; z-index: 50; }
+    .skip:focus { left: 12px; }
+
+    header.site {
+      position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding: 14px var(--gutter);
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+    }
+    .brand { font-family: var(--serif); font-weight: 700; font-size: 19px; color: var(--ink); text-decoration: none; }
+    header nav { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+    header nav a { color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 500; }
+    header nav a:hover { color: var(--link); }
+
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 8px; border: 1px solid var(--ink); font-family: var(--sans); font-size: 15px; font-weight: 600; text-decoration: none; }
+    .btn.primary { background: var(--ink); color: var(--paper); }
+    .btn.primary:hover { background: var(--link-hover); border-color: var(--link-hover); color: var(--paper); }
+    .btn.ghost { background: transparent; color: var(--ink); }
+    .btn.ghost:hover { background: var(--surface); color: var(--ink); }
+    header .btn { padding: 8px 14px; font-size: 14px; }
+    .ext::after { content: "↗"; font-weight: 400; }
+
+    /* Hero */
+    .hero {
+      display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: clamp(32px, 5vw, 72px); align-items: end;
+      max-width: 1320px; margin: 0 auto;
+      padding: clamp(40px, 7vw, 88px) var(--gutter) clamp(40px, 6vw, 72px);
+    }
+    .crumb { font-size: 15px; margin-bottom: 22px; }
+    .crumb a { color: var(--muted); text-decoration: none; }
+    .crumb a:hover { color: var(--ink); text-decoration: underline; }
+    .crumb span { color: var(--muted); margin: 0 8px; }
+    .kicker { color: var(--muted); font-size: 16px; margin-bottom: 14px; }
+    .hero h1 { font-size: clamp(38px, 5.2vw, 60px); line-height: 1.06; letter-spacing: -0.025em; margin-bottom: 22px; }
+    .hero .lede { font-size: 19px; color: var(--muted); max-width: 54ch; margin-bottom: 28px; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .facts { margin: 0; display: grid; gap: 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 20px 22px; }
+    .facts div { display: grid; gap: 2px; }
+    .facts dt { font-size: 13px; color: var(--muted); }
+    .facts dd { margin: 0; font-weight: 600; font-size: 15.5px; }
+
+    /* Docs layout */
+    .doc { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); max-width: 1320px; margin: 0 auto; padding: 0 var(--gutter); }
+    .toc { position: sticky; top: calc(96px + env(safe-area-inset-top, 0px)); align-self: start; padding-top: 64px; }
+    .toc p { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+    .toc ol { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--rule); }
+    .toc a { display: block; padding: 6px 0 6px 16px; margin-left: -1px; border-left: 2px solid transparent; color: var(--muted); text-decoration: none; font-size: 14.5px; }
+    .toc a:hover { color: var(--ink); }
+    .toc a.active { color: var(--ink); border-left-color: var(--ink); font-weight: 600; }
+
+    .content > section { padding: 64px 0; border-top: 1px solid var(--rule); }
+    .content p { max-width: var(--measure); }
+    .muted { color: var(--muted); }
+
+    /* Features: two-column definition grid */
+    .features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin-top: 24px; border-top: 1px solid var(--rule); }
+    .features article { padding: 22px 28px 22px 0; border-bottom: 1px solid var(--rule); }
+    .features article:nth-child(even) { padding: 22px 0 22px 28px; border-left: 1px solid var(--rule); }
+    .features p { color: var(--muted); margin: 0; font-size: 16px; }
+
+    /* Workflow: a real sequence, so numbered */
+    .flow { list-style: none; padding: 0; margin: 24px 0 0; counter-reset: step; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); overflow: hidden; }
+    .flow li { counter-increment: step; padding: 20px 18px; border-left: 1px solid var(--rule); }
+    .flow li:first-child { border-left: 0; }
+    .flow li::before { content: counter(step); display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--ink); font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+    .flow strong { display: block; font-family: var(--serif); font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+    .flow span { display: block; font-size: 15px; color: var(--muted); line-height: 1.5; }
+    .note { color: var(--muted); font-size: 14.5px; margin-top: 14px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--rule); font-size: 14.5px; font-weight: 500; }
+    .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 40px; }
+    .two h3 { font-size: 17px; margin-bottom: 12px; }
+
+    .takeaway { font-family: var(--serif); font-size: 21px; line-height: 1.55; max-width: 60ch; }
+
+    .cta { background: var(--ink); color: var(--paper); border-radius: 16px; padding: clamp(28px, 5vw, 48px); }
+    .cta h2 { color: var(--paper); }
+    .cta p { color: color-mix(in srgb, var(--paper) 78%, var(--ink)); font-size: 18px; }
+    .cta .btn.primary { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+    .cta .btn.primary:hover { background: var(--mark); border-color: var(--mark); color: #16233B; }
+    .cta .btn.ghost { color: var(--paper); border-color: color-mix(in srgb, var(--paper) 50%, transparent); }
+    .cta .btn.ghost:hover { background: color-mix(in srgb, var(--paper) 12%, transparent); }
+    .content > section.end { border-top: 0; padding-top: 8px; }
+
+    footer { max-width: 1320px; margin: 0 auto; padding: 28px var(--gutter) 40px; color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    footer a { color: var(--muted); }
+
+    @media (max-width: 1080px) {
+      .flow { grid-template-columns: minmax(0, 1fr); }
+      .flow li { border-left: 0; border-top: 1px solid var(--rule); display: grid; grid-template-columns: 40px 1fr; column-gap: 12px; }
+      .flow li:first-child { border-top: 0; }
+      .flow li::before { margin: 0; grid-row: span 2; }
+    }
+    @media (max-width: 960px) {
+      .hero, .doc, .two { grid-template-columns: minmax(0, 1fr); }
+      .toc { display: none; }
+    }
+    @media (max-width: 720px) {
+      .features { grid-template-columns: minmax(0, 1fr); }
+      .features article, .features article:nth-child(even) { padding: 20px 0; border-left: 0; }
+      .content > section { padding: 52px 0; }
+    }
+  
+    /* Guide outline */
+    .outline { margin: 24px 0 0; padding: 0; list-style: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+    .outline li { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 20px; padding: 16px 22px; border-top: 1px solid var(--rule); }
+    .outline li:first-child { border-top: 0; }
+    .outline strong { font-family: var(--serif); font-weight: 600; font-size: 17px; }
+    .outline span { color: var(--muted); font-size: 15.5px; }
+    .contrib { margin: 0; padding-left: 20px; max-width: var(--measure); }
+    .contrib li { margin-bottom: 8px; }
+    .contrib li::marker { color: var(--muted); }
+    .chips.top { margin-top: 26px; }
+    .callout { border-left: 3px solid var(--ink); background: var(--surface); padding: 16px 20px; border-radius: 0 8px 8px 0; color: var(--muted); font-size: 15.5px; max-width: var(--measure); margin-top: 24px; }
+    @media (max-width: 720px) { .outline li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+  
+    /* Architecture diagram */
+    .figure { margin: 24px 0 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 20px; overflow-x: auto; }
+    .figure svg { display: block; width: 100%; min-width: 560px; height: auto; }
+    .figure figcaption { color: var(--muted); font-size: 14.5px; margin-top: 12px; }
+    .dg-box { fill: var(--paper); stroke: var(--rule); stroke-width: 1.5; }
+    .dg-zone { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 5 5; }
+    .dg-core { fill: var(--ink); }
+    .dg-t { font-family: var(--sans); font-size: 14px; font-weight: 600; fill: var(--ink); }
+    .dg-s { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
+    .dg-ct { font-family: var(--sans); font-size: 15px; font-weight: 700; fill: var(--paper); }
+    .dg-cs { font-family: var(--sans); font-size: 12px; fill: var(--paper); opacity: .8; }
+    .dg-line { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+    .dg-arrow { fill: var(--ink); }
+
+    /* Sizing table */
+    .table-wrap { overflow-x: auto; margin-top: 20px; }
+    table { border-collapse: collapse; width: 100%; min-width: 420px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; font-size: 15.5px; }
+    th, td { text-align: left; padding: 12px 18px; border-top: 1px solid var(--rule); }
+    thead th { border-top: 0; font-size: 14px; color: var(--muted); font-weight: 600; background: var(--paper); }
+    tbody th { font-weight: 600; }
+
+    /* Decisions */
+    .decisions { margin-top: 24px; border-top: 1px solid var(--rule); }
+    .decisions article { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 28px; padding: 22px 0; border-bottom: 1px solid var(--rule); }
+    .decisions h3 { font-size: 18px; }
+    .decisions p { margin: 0; color: var(--muted); }
+    .decisions blockquote { margin: 10px 0 0; padding: 10px 14px; border-left: 3px solid var(--ink); background: var(--surface); font-family: var(--serif); font-size: 16px; color: var(--ink); border-radius: 0 6px 6px 0; }
+
+    /* Excerpt styled as a help page */
+    .excerpt { margin-top: 24px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+    .excerpt-bar { padding: 10px 18px; border-bottom: 1px solid var(--rule); background: var(--paper); color: var(--muted); font-size: 13.5px; }
+    .excerpt-body { padding: 22px 26px 18px; }
+    .excerpt-body h3 { font-size: 20px; margin-bottom: 12px; }
+    .excerpt-body ol, .excerpt-body ul { margin: 0 0 8px; padding-left: 24px; max-width: var(--measure); }
+    .excerpt-body li { margin-bottom: 6px; }
+    .excerpt-body b { font-weight: 600; }
+    .excerpt + .excerpt { margin-top: 16px; }
+    @media (max-width: 720px) { .decisions article { grid-template-columns: minmax(0, 1fr); gap: 6px; } .excerpt-body { padding: 18px; } }
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site">
+  <a class="brand" href="index.html">Afrid Imtiyaz</a>
+  <nav aria-label="Main">
+    <a href="index.html#work">Back to portfolio</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+  <a class="btn primary" href="resume.pdf" download>Résumé</a>
+</header>
+
+<main id="main">
+  <div class="hero">
+    <div>
+      <p class="crumb"><a href="index.html">Portfolio</a><span aria-hidden="true">/</span><a href="index.html#work">All projects</a></p>
+      <p class="kicker">Technical writing case study</p>
+      <h1>Deploying Log360 on AWS</h1>
+      <p class="lede">
+        How I documented a cloud deployment of an enterprise SIEM, taking
+        administrators from sizing the EC2 instance to confirming that logs
+        are arriving, on a single help page.
+      </p>
+      <div class="actions">
+        <a class="btn primary" href="#decisions">See the writing decisions</a>
+        <!-- If the page is live on the ManageEngine site, add:
+        <a class="btn ghost ext" href="PASTE-LIVE-URL" target="_blank" rel="noopener noreferrer">Read the published page</a> -->
+        <a class="btn ghost" href="index.html#work">All projects</a>
+      </div>
+      <div class="chips top">
+        <span class="tag">Help Documentation</span>
+        <span class="tag">Deployment Guide</span>
+        <span class="tag">Amazon EC2</span>
+        <span class="tag">Amazon S3</span>
+        <span class="tag">Information Architecture</span>
+      </div>
+    </div>
+    <dl class="facts" aria-label="Project at a glance">
+      <div><dt>Role</dt><dd>Technical Writer</dd></div>
+      <div><dt>Product</dt><dd>ManageEngine Log360, a SIEM and log-management product</dd></div>
+      <div><dt>Deliverable</dt><dd>Help page: deployment guide</dd></div>
+      <div><dt>Readers</dt><dd>IT and security administrators</dd></div>
+      <div><dt>Covers</dt><dd>EC2 setup, S3 archiving, log source onboarding, verification</dd></div>
+    </dl>
+  </div>
+
+  <div class="doc">
+    <nav class="toc" aria-label="On this page">
+      <p>On this page</p>
+      <ol>
+        <li><a href="#overview">Project overview</a></li>
+        <li><a href="#challenge">Documentation challenge</a></li>
+        <li><a href="#structure">Page structure</a></li>
+        <li><a href="#architecture">Architecture diagram</a></li>
+        <li><a href="#decisions">Writing decisions</a></li>
+        <li><a href="#excerpt">From the guide</a></li>
+        <li><a href="#skills">Skills demonstrated</a></li>
+        <li><a href="#outcome">Project outcome</a></li>
+      </ol>
+    </nav>
+
+    <div class="content">
+      <section id="overview">
+        <h2>Project overview</h2>
+        <p>
+          Log360 can be installed on an Amazon EC2 instance to collect and analyze
+          logs from AWS services, EC2 instances, and on-premises systems, and to
+          archive logs to Amazon S3 for long-term retention.
+        </p>
+        <p>
+          I wrote the help page that explains this deployment end to end: planning
+          resources, creating the EC2 instance, connecting it to log sources,
+          installing the product, configuring S3 archiving, onboarding log sources,
+          and verifying that everything works.
+        </p>
+      </section>
+
+      <section id="challenge">
+        <h2>Documentation challenge</h2>
+        <p>
+          A cloud deployment sits between two systems. Administrators work in the
+          AWS Management Console to create and network the instance, and in Log360
+          to install the product and add log sources. Some readers know AWS well but
+          not Log360; others know Log360 but are new to AWS.
+        </p>
+        <p>
+          Much of the related information, such as installation steps, system
+          requirements, ports, and agent setup, already existed on other pages. The
+          challenge was to cover everything specific to AWS without repeating those
+          pages or letting them drift out of sync.
+        </p>
+      </section>
+
+      <section id="structure">
+        <h2>Page structure</h2>
+        <p class="muted">The page follows the order in which an administrator actually deploys the product.</p>
+        <ol class="outline">
+          <li><strong>Overview</strong><span>What the deployment does and what it includes.</span></li>
+          <li><strong>Prerequisites</strong><span>Instance, network, security groups, IAM credentials, storage, and S3 bucket to have ready.</span></li>
+          <li><strong>Plan your deployment</strong><span>Architecture, instance sizing by log volume, storage, AWS licensing, and log source connectivity.</span></li>
+          <li><strong>Set up the AWS environment</strong><span>Create the EC2 instance and configure network connectivity.</span></li>
+          <li><strong>Set up Log360 on the EC2 instance</strong><span>Install the product, linking to the standard installation guide.</span></li>
+          <li><strong>Configure log archiving to Amazon S3</strong><span>Keep active data on SSD and use S3 for archives only.</span></li>
+          <li><strong>Onboard log sources</strong><span>Add AWS services, EC2 instances through agents, and on-premises sources.</span></li>
+          <li><strong>Verify the deployment</strong><span>Check console access, log collection, and S3 archiving.</span></li>
+        </ol>
+      </section>
+
+      <section id="architecture">
+        <h2>Architecture diagram</h2>
+        <p>
+          I included a deployment diagram so readers can see where each component
+          sits before they start configuring it. It shows logs flowing into the
+          Log360 server from three directions, and archived logs flowing out to S3.
+        </p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 420" role="img" aria-labelledby="dg-title dg-desc">
+            <title id="dg-title">Log360 deployment on AWS</title>
+            <desc id="dg-desc">AWS services and AWS EC2 instances inside the AWS Cloud, and on-premises sources outside it, send logs to the Log360 server on a Windows EC2 instance. The server sends archived logs to an Amazon S3 bucket.</desc>
+            <defs>
+              <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="dg-arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+            </defs>
+            <rect class="dg-zone" x="300" y="10" width="440" height="160" rx="12"/>
+            <text class="dg-s" x="320" y="34">AWS Cloud</text>
+            <rect class="dg-box" x="320" y="50" width="190" height="96" rx="10"/>
+            <text class="dg-t" x="415" y="90" text-anchor="middle">AWS services</text>
+            <text class="dg-s" x="415" y="112" text-anchor="middle">CloudTrail, CloudWatch, etc.</text>
+            <rect class="dg-box" x="530" y="50" width="190" height="96" rx="10"/>
+            <text class="dg-t" x="625" y="90" text-anchor="middle">AWS EC2 instances</text>
+            <text class="dg-s" x="625" y="112" text-anchor="middle">Windows and Linux</text>
+
+            <rect class="dg-box" x="20" y="222" width="200" height="96" rx="10"/>
+            <text class="dg-t" x="120" y="262" text-anchor="middle">On-premises sources</text>
+            <text class="dg-s" x="120" y="284" text-anchor="middle">Servers, network devices</text>
+
+            <rect class="dg-core" x="300" y="222" width="230" height="96" rx="10"/>
+            <text class="dg-ct" x="415" y="262" text-anchor="middle">Log360 server</text>
+            <text class="dg-cs" x="415" y="284" text-anchor="middle">Windows EC2 instance</text>
+
+            <rect class="dg-box" x="320" y="350" width="190" height="60" rx="10"/>
+            <text class="dg-t" x="415" y="376" text-anchor="middle">Amazon S3 bucket</text>
+            <text class="dg-s" x="415" y="396" text-anchor="middle">Long-term retention</text>
+
+            <path class="dg-line" d="M415 146 V218" marker-end="url(#ah)"/>
+            <path class="dg-line" d="M625 146 V190 H490 V218" marker-end="url(#ah)"/>
+            <path class="dg-line" d="M220 270 H296" marker-end="url(#ah)"/>
+            <path class="dg-line" d="M415 318 V346" marker-end="url(#ah)"/>
+            <text class="dg-s" x="424" y="186">Logs</text>
+            <text class="dg-s" x="590" y="184">Logs</text>
+            <text class="dg-s" x="240" y="262">Logs</text>
+            <text class="dg-s" x="424" y="338">Archived logs</text>
+          </svg>
+          <figcaption>Deployment architecture, redrawn for this case study.</figcaption>
+        </figure>
+      </section>
+
+      <section id="decisions">
+        <h2>Writing decisions</h2>
+        <p class="muted">The choices that shaped the page, and why I made them.</p>
+        <div class="decisions">
+          <article>
+            <h3>Follow the deployer's order</h3>
+            <div>
+              <p>Each section matches the next thing an administrator does, from planning to verification, so the page can be followed top to bottom during a real deployment.</p>
+            </div>
+          </article>
+          <article>
+            <h3>Link instead of repeating</h3>
+            <div>
+              <p>Installation, system requirements, ports, and agent setup already had their own pages. I stated what applies and linked to them, so updates happen in one place.</p>
+              <blockquote>The standard Log360 installation procedure applies when installing the product on an EC2 instance.</blockquote>
+            </div>
+          </article>
+          <article>
+            <h3>Put decisions before steps</h3>
+            <div>
+              <p>Sizing the instance is the choice that is hardest to undo, so the planning section comes before any setup steps and gives a clear rule for when a single node is enough.</p>
+            </div>
+          </article>
+          <article>
+            <h3>Warn where mistakes are costly</h3>
+            <div>
+              <p>I called out the errors most likely to cause problems later, such as storing search indexes in S3 or pointing agents at an address they cannot reach.</p>
+              <blockquote>Do not use Amazon S3 for active search indexes.</blockquote>
+            </div>
+          </article>
+          <article>
+            <h3>Match the AWS console</h3>
+            <div>
+              <p>Steps use the exact labels administrators see in the AWS Management Console, such as Launch instance and Application and OS Images (AMI), so readers never have to guess where to click.</p>
+            </div>
+          </article>
+          <article>
+            <h3>End with a way to check</h3>
+            <div>
+              <p>The page closes with a verification checklist, so administrators know when the deployment is complete instead of assuming it is.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="excerpt">
+        <h2>From the guide</h2>
+        <p class="muted">Excerpts showing the planning guidance, a procedure, and the verification checklist.</p>
+
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only" style="position:absolute;left:-9999px">EC2 instance sizing for Log360</caption>
+            <thead><tr><th scope="col">Resource</th><th scope="col">Minimum</th><th scope="col">Recommended</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Processor cores</th><td>12</td><td>24</td></tr>
+              <tr><th scope="row">RAM</th><td>32 GB</td><td>48 GB</td></tr>
+              <tr><th scope="row">Disk IOPS</th><td>750</td><td>More than 5,000</td></tr>
+              <tr><th scope="row">SSD storage</th><td>1.2 TB</td><td>2.5 TB</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">A single node handles up to 250 GB a day of log flow or 2 TB of search data. Larger deployments follow the scalability architecture.</p>
+
+        <div class="excerpt">
+          <div class="excerpt-bar">Set up the AWS environment</div>
+          <div class="excerpt-body">
+            <h3>Create an EC2 instance</h3>
+            <ol>
+              <li>Sign in to the AWS Management Console and open the EC2 dashboard.</li>
+              <li>Select the AWS Region in which you want to deploy the product.</li>
+              <li>Click <b>Launch instance</b>.</li>
+              <li>Enter a name for the EC2 instance.</li>
+              <li>Under <b>Application and OS Images (AMI)</b>, select a supported operating system for the product.</li>
+              <li>Under <b>Instance type</b>, select an instance type that meets the CPU and memory requirements specified in the system requirements.</li>
+              <li>Configure a key pair for secure access to the EC2 instance.</li>
+              <li>Under <b>Network settings</b>, select the VPC and subnet that provide connectivity to the log sources that you want to monitor.</li>
+              <li>Configure the security group to allow the ports required for accessing the product and collecting logs.</li>
+              <li>Under <b>Configure storage</b>, attach SSD-backed storage that meets the product's storage requirements.</li>
+              <li>Review the configuration and click <b>Launch instance</b>.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="excerpt">
+          <div class="excerpt-bar">Verify the deployment</div>
+          <div class="excerpt-body">
+            <h3>Verify log collection</h3>
+            <p>Check that:</p>
+            <ul>
+              <li>AWS cloud sources are connected successfully.</li>
+              <li>Logs from AWS EC2 instances are being collected.</li>
+              <li>Agent-based sources are communicating with the product server.</li>
+              <li>On-premises sources can send logs to the EC2 instance.</li>
+              <li>Logs are appearing in the product console.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="skills">
+        <h2>Skills demonstrated</h2>
+        <div class="chips">
+          <span class="tag">Deployment Documentation</span>
+          <span class="tag">Task-Based Writing</span>
+          <span class="tag">Information Architecture</span>
+          <span class="tag">Content Reuse</span>
+          <span class="tag">Technical Diagrams</span>
+          <span class="tag">AWS (EC2, S3, IAM, VPC)</span>
+          <span class="tag">SIEM and Log Management</span>
+        </div>
+      </section>
+
+      <section id="outcome">
+        <h2>Project outcome</h2>
+        <p class="takeaway">
+          A single help page that takes an administrator from planning to a verified
+          Log360 deployment on AWS, covering only what is specific to AWS and linking
+          to existing pages for everything else.
+        </p>
+      </section>
+
+      <section class="end">
+        <div class="cta">
+          <h2>Next case study</h2>
+          <p>See how I structured a help guide for a complex enterprise software migration workflow, from prerequisites to troubleshooting.</p>
+          <div class="actions">
+            <a class="btn primary" href="ueba-migration.html">Read: Software Migration Guide</a>
+            <a class="btn ghost" href="index.html#work">Back to selected work</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>© 2026 Afrid Imtiyaz · Technical Writing Portfolio</span>
+  <a href="#main">Back to top</a>
+</footer>
+<script>
+(function () {
+  var links = document.querySelectorAll(".toc a"), map = {};
+  links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  if (!("IntersectionObserver" in window)) return;
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting && map[e.target.id]) {
+        links.forEach(function (a) { a.classList.remove("active"); });
+        map[e.target.id].classList.add("active");
+      }
+    });
+  }, { rootMargin: "-30% 0px -60% 0px" });
+  document.querySelectorAll(".content > section[id]").forEach(function (s) { io.observe(s); });
+})();
+</script>
+</body>
+</html>
